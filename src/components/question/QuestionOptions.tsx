@@ -92,6 +92,7 @@ const QuestionOptions = ({
       }
       UserAnswer.push(Number(value));
     }
+
     handleUnSelectedList(nullAnswer);
     handleUserAnswerList(UserAnswer);
     handleShowNotify(true);

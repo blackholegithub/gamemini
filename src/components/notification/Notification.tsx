@@ -86,6 +86,8 @@ const Notification = ({
         indexCorrect: indexCorrect,
         score: count,
       })
+
+      
     );
   };
   // console.log('AnswerData ',AnswerData);

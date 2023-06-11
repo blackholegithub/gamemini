@@ -2,7 +2,8 @@ import { useEffect,useState, useRef } from "react"
 import { useSelector,useDispatch } from "react-redux";
 
 import { RootState } from "../../app/store";
-import { addTime } from "../../app/submitSlice";
+import { addTime,submitData, addAnswerData } from "../../app/submitSlice";
+
 import  debounce  from "../../debounce/debounce";
 
 type PropId ={
@@ -76,6 +77,57 @@ const Header = ({id ,name} : PropId) => {
       clearInterval(interval);
     };
   }, [startTime]);
+
+
+  //handling when overtime 
+  const timoOut =   latestValueRef.current
+  useEffect(()=>{
+  console.log('timoOut', timoOut)
+  if(!isSubmitted && !isViewMode && data && timoOut) {
+    if(timoOut.minutes === 59 && timoOut.seconds ===59){
+      dispatch(submitData(true))
+      dispatch(addTime(timoOut))
+      sessionStorage.setItem("isSubmited", "true");
+
+      let count = 0;
+      const correctAnswer = [];
+      const indexCorrect = [];
+      const userAnswer = [];
+      const userAnswerList:number[] = [];
+      for (let i = 0; i < 10; i++) {
+      
+        let value = sessionStorage.getItem(`question ${i} `);
+        if (value === null) {
+          value = "-1";
+        }
+        userAnswerList.push(Number(value));
+
+        correctAnswer.push(data.data[i].correct_answer);
+        userAnswer.push(data.ListAnswers[i][userAnswerList[i]]);
+        indexCorrect.push(
+          data.ListAnswers[i].indexOf(data.data[i].correct_answer)
+        );
+  
+        if (
+          userAnswerList[i] ===
+          data.ListAnswers[i].indexOf(data.data[i].correct_answer)
+        ) {
+          count += 1;
+        }
+      }
+
+      dispatch(
+        addAnswerData({
+          userAnswer: userAnswerList,
+          correctAnswer: correctAnswer,
+          indexCorrect: indexCorrect,
+          score: count,
+        }))
+      
+    }
+  }
+  },[timoOut])
+
    
   const dispatchData = debounce(() => {
     dispatch(addTime(latestValueRef.current));
